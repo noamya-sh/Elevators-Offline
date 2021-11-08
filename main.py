@@ -1,4 +1,5 @@
 import json
+
 class Elevator:
     def __init__(self,_id:int =None,_speed:float =None, _minFloor:int =None, _maxFloor:int =None,
                  _closeTime:float =None,_openTime:float =None,_startTime:float =None,_stopTime:float =None,**kwargs):
@@ -53,11 +54,11 @@ class Building:
         return s
 
 
-if __name__ == '__main__':
-    b=Building()
-    b.init_from_file("B5.json")
-    # d={'_id': 0, '_speed': 0.5, '_minFloor': -2, '_maxFloor': 10, '_closeTime': 2.0, '_openTime': 2.0,
-    # '_startTime': 3.0, '_stopTime': 3.0}
-    # for i in b.elevators:
-    #     print(b.elevators[i])
-    print(b)
+# if __name__ == '__main__':
+#     b=Building()
+#     b.init_from_file(r"C:\Users\נעמיה\PycharmProjects\Elevators-Offline\B5.json")
+#     # d={'_id': 0, '_speed': 0.5, '_minFloor': -2, '_maxFloor': 10, '_closeTime': 2.0, '_openTime': 2.0,
+#     # '_startTime': 3.0, '_stopTime': 3.0}
+#     # for i in b.elevators:
+#     #     print(b.elevators[i])
+#     print(b)
