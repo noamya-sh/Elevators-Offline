@@ -37,9 +37,9 @@ class Building:
             i=0
             el={}
             for d in list_ele:
-                elvator=Elevator()
-                elvator.__dict__.update(d)
-                # elvator = Elevator(**d)
+                # elvator=Elevator()
+                # elvator.__dict__.update(d)
+                elvator = Elevator(**d)
                 el[i] = elvator
                 i+=1
             self.elevators=el
@@ -54,11 +54,11 @@ class Building:
         return s
 
 
-# if __name__ == '__main__':
-#     b=Building()
-#     b.init_from_file(r"C:\Users\נעמיה\PycharmProjects\Elevators-Offline\B5.json")
-#     # d={'_id': 0, '_speed': 0.5, '_minFloor': -2, '_maxFloor': 10, '_closeTime': 2.0, '_openTime': 2.0,
-#     # '_startTime': 3.0, '_stopTime': 3.0}
-#     # for i in b.elevators:
-#     #     print(b.elevators[i])
-#     print(b)
+if __name__ == '__main__':
+    b=Building()
+    b.init_from_file("B3.json")
+    # d={'_id': 0, '_speed': 0.5, '_minFloor': -2, '_maxFloor': 10, '_closeTime': 2.0, '_openTime': 2.0,
+    # '_startTime': 3.0, '_stopTime': 3.0}
+    # for i in b.elevators:
+    #     print(b.elevators[i])
+    print(b)
