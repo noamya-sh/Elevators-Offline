@@ -30,22 +30,6 @@ class Building:
             self.el = e
 
 
-import csv
-
-
-def readcsv(file_name: str):
-    with open(file_name) as file:
-        rows = []
-        a = []
-        csvreader = csv.reader(file)
-        header = csvreader
-        for row in csvreader:
-            rows.append(row)
-        print(header)
-        print(rows)
-        #rows.index(1)
-
-
 # if __name__ == '__main__':
 #     b = Building()
 #     b.from_json("B5.json")
