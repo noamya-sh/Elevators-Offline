@@ -56,7 +56,7 @@ class Building:
 
 if __name__ == '__main__':
     b=Building()
-    b.init_from_file("B2.json")
+    b.init_from_file("B1.json")
     # d={'_id': 0, '_speed': 0.5, '_minFloor': -2, '_maxFloor': 10, '_closeTime': 2.0, '_openTime': 2.0,
     # '_startTime': 3.0, '_stopTime': 3.0}
     # for i in b.elevators:
