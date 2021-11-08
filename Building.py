@@ -4,7 +4,7 @@ from Elevator import Elevator
 
 
 class Building:
-    def __init__(self, minFloor=None, maxFloor=None, el={}, **kwargs):
+    def __init__(self, minFloor:int=None, maxFloor:int=None, el:Elevator={}, **kwargs):
         self.minFloor = minFloor
         self.maxFloor = maxFloor
         self.el = el
@@ -46,14 +46,14 @@ def readcsv(file_name: str):
         #rows.index(1)
 
 
-if __name__ == '__main__':
-    b = Building()
-    b.from_json("B5.json")
-    E = b.el[3]._speed
-    s = b.minFloor
-    # print(b)
-    # print(E)
-    print(s)
-    for i in b.el:
-         print(b.el[i])
-    readcsv("Calls_a.csv")
+# if __name__ == '__main__':
+#     b = Building()
+#     b.from_json("B5.json")
+#     E = b.el[3]._speed
+#     s = b.minFloor
+#     # print(b)
+#     # print(E)
+#     # print(s)
+#     for i in b.el:
+#          print(b.el[i])
+#     # readcsv("Calls_a.csv")

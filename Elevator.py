@@ -1,5 +1,7 @@
 class Elevator:
-    def __init__(self, _id=None, _speed=None, _minFloor=None, _maxFloor=None, _closeTime=None, _openTime=None, _startTime=None, _stopTime=None, **kwargs):
+    def __init__(self, _id:int=None, _speed:float=None, _minFloor:int=None,
+                 _maxFloor:int=None, _closeTime:float=None, _openTime:float=None,
+                 _startTime:float=None, _stopTime:float=None, **kwargs):
         self._id = _id
         self._speed = _speed
         self._minFloor = _minFloor
