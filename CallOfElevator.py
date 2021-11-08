@@ -24,8 +24,8 @@ def readcsv1(file_name:str=""):
                                 ele=int(row[5]))
             a.append(c)
             rows.append(row)
-            for i in a:
-                print(i)
+        for i in a:
+            print(i)
 
 
 
