@@ -1,5 +1,7 @@
 import csv
-import Building
+import sys
+
+from Building import Building
 from CallOfElevator import CallOfElevator
 
 
@@ -16,25 +18,24 @@ class Algo:
             rows = []
             a = []
             csvreader = csv.reader(file)
-            header = csvreader
-            for row in csvreader:
-                rows.append(row)
-            print(header)
-            print(rows)
-
-    def readcsv1(file_name: str = ""):
-        with open(file_name) as file:
-            rows = []
-            a = []
-            csvreader = csv.reader(file)
             for row in csvreader:
                 c = CallOfElevator(name=row[0], Time=row[1], src=row[2],
-                                   dest=row[3], sta=row[4],ele=int(row[5]))
-                a.append(c)
-                rows.append(row)
-            for i in a:
-                print(i)
+                                   dest=row[3], sta=row[4], ele=int(row[5]))
+                Algo.allocte(c)
 
-    # if __name__ == '__main__':
-    #     readcsv1("Calls_d.csv")
+    def allocte(self, call:CallOfElevator=None):
+        min=sys.maxint
+        j=0
+        count=0
+        for i in self.building.el:
+            t = allTime(i,call)
+            if t<min:
+                min=t
+                j=count
+            count+=1
+        writeCsv(call,j)
+        addCall(j,call)
+
+if __name__ == '__main__':
+    Algo.readcsv("Calls_d.csv")
 #     a=Algo("<Building.json> <Calls.csv> <output.csv>")
