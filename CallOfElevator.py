@@ -27,6 +27,10 @@ def readcsv1(file_name:str=""):
         for i in a:
             print(i)
 
+def writecsv(file,list):
+    with open(file,'w') as f:
+        csvwriter=csv.writer(f)
+        csvwriter.writerows(list)
 
 
 
