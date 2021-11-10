@@ -27,25 +27,16 @@ def readcsv1(file_name:str=""):
         for i in a:
             print(i)
 
-def writecsv(file,list):
-    with open(file,'w') as f:
-        csvwriter=csv.writer(f)
-        csvwriter.writerows(list)
 
 
 
-if __name__ == '__main__':
+
+
+
+
+
+#if __name__ == '__main__':
     # file="Calls_a.csv"
     #c.readcsv1(file)
-    # with open("Calls_b.csv") as file:
-    #     a = []
-    #     csvreader = csv.reader(file)
-    #     for row in csvreader:
-    #         c = CallOfElevator(name=row[0], Time=row[1], src=row[2], dest=row[3], sta=row[4],
-    #                        ele=int(row[5]))
-    #         a.append(c)
-        # for i in a:
-        #     print(i.src)
-        #     print(i.dest)
 
-        readcsv1("Calls_b.csv")
+
