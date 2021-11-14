@@ -1,3 +1,4 @@
+from floorStop import *
 class lll:
     def __init__(self,x):
         self._dd=x;
@@ -7,8 +8,9 @@ class kkk:
         self.gg=y
 
 if __name__ == '__main__':
-    c=lll(4)
-    x={}
-    x["xx"]=2
-    print(x)
+    def vv(x):
+        return (x,2*x)
+    i,j = vv(5)
+    print(i)
+    print(j)
 
