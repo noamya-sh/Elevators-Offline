@@ -1,5 +1,4 @@
 import json
-
 class Elevator:
     def __init__(self,_id:int =None,_speed:float =None, _minFloor:int =None, _maxFloor:int =None,
                  _closeTime:float =None,_openTime:float =None,_startTime:float =None,_stopTime:float =None,**kwargs):
@@ -61,4 +60,4 @@ if __name__ == '__main__':
     # '_startTime': 3.0, '_stopTime': 3.0}
     # for i in b.elevators:
     #     print(b.elevators[i])
-    print(b)
+    print(b.elevato)
