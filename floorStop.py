@@ -7,4 +7,5 @@ class floorStop:
         self.time += t
         return self
 
-    def __
+    def __lt__(self, other):
+        return self.time > other.time

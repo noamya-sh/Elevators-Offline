@@ -20,9 +20,9 @@ class Elevator:
 
     def __add__(self, call:CallOfElevator):
         self.calls.append(CallOfElevator)
-        self.fs.append(floorStop(call.src,reachFloor(call.src)))
-        self.fs.append(floorStop(call.dest, reachFloor(call.dest)))
-        #self.fs.sort
+        self.fs.append(floorStop(call.src,reachFloor(call.src,call.Time)))
+        self.fs.append(floorStop(call.dest, reachFloor(call.dest,call.Time)))
+        # self.fs.sort
         return self
 
     def __iter__(self):
@@ -65,5 +65,5 @@ class Elevator:
     def reachFloor(self,floor:int,timeInit): #return the time that elevator reach the floor
         if not self.fs:
             return self._startTime+disinTime(abs(floor))+self._stopTime+self._openTime
-
-        pos =
+        return
+        # pos =
