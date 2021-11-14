@@ -1,10 +1,7 @@
 import json
 
-from Elevator import Elevator
-
-
 class Building:
-    def __init__(self, minFloor:int=None, maxFloor:int=None, el:Elevator={}, **kwargs):
+    def __init__(self, minFloor: int = None, maxFloor: int = None, el: Elevator = {}, **kwargs):
         self.minFloor = minFloor
         self.maxFloor = maxFloor
         self.el = el
@@ -14,6 +11,9 @@ class Building:
         for i in self.el:
             c += str(self.el[i])
         return f"minFloor=:{self.minFloor}, maxFloor=:{self.maxFloor}, el:{c}"
+
+    def __iter__(self):
+        return self.el.values().__iter__()
 
     def from_json(self, file_name: str):
         with open(file_name, "r") as f:
@@ -28,7 +28,6 @@ class Building:
                 e[i] = Elev
                 i += 1
             self.el = e
-
 
 # if __name__ == '__main__':
 #     b = Building()

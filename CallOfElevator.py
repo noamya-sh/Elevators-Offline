@@ -13,7 +13,6 @@ class CallOfElevator:
     def __str__(self) -> str:
         return f"{self.name}, {self.Time}, src:{self.src}, dest:{self.dest}, {self.sta}, {self.ele}"
 
-
 def readcsv1(file_name:str=""):
     with open(file_name) as file:
         rows = []
@@ -26,17 +25,4 @@ def readcsv1(file_name:str=""):
             rows.append(row)
         for i in a:
             print(i)
-
-
-
-
-
-
-
-
-
-#if __name__ == '__main__':
-    # file="Calls_a.csv"
-    #c.readcsv1(file)
-
 
