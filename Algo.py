@@ -2,7 +2,7 @@ import csv
 import sys
 
 from Building import Building
-from CallOfElevator import CallOfElevator
+from CallOfElevator import *
 from Elevator import * #Elevator
 
 
@@ -11,7 +11,8 @@ class Algo:
         # self.building=Building()
         list = string.split(" ")
         b = Building()
-        self.building = b.from_json(list[0])
+        b.from_json(list[0])
+        self.building = b
         self.csv = self.readcsv(list[1])
         self.out = list[2]
         self.writeCsv(self.out, self.csv)
@@ -29,13 +30,19 @@ class Algo:
             return CallsList
 
     def allocate(self, call: CallOfElevator=None):
-
+        k = self.building.el[0]
+        k.call2test=call
+        i = 0
         for e in self.building:
-            return min()
-        if call.src <= -1 and call.Time<90.155555555:
-            return 0
-        else:
-            return 1
+            e.call2test = call
+            if k>e:
+               k=e
+        k+=call
+        return k._id
+        # if call.src <= -1 and call.Time<90.155555555:
+        #     return 0
+        # else:
+        #     return 1
 
 
     def writeCsv(self, file, list):
@@ -52,10 +59,11 @@ if __name__ == '__main__':
     # d=Algo("B2.json")
     # b=Building()
     # b.from_json("B2.json")
-    # d.building=b
-    # a=d.readcsv("Calls_b.csv")
+    # # d.building=b
+    # d=Algo()
+    # print(d.readcsv("C:\\Users\\נעמיה\\PycharmProjects\\Elevators-Offline\\Calls_a.csv"))
     # d.writeCsv("try.csv",a)
-    Algo("B2.json Calls_b.csv try.csv")
+    Algo("B5.json C:\\Users\\נעמיה\\PycharmProjects\\Elevators-Offline\\Calls_c.csv try.csv")
     # a = Algo.readcsv("Calls_b.csv")
     # Algo.writeCsv("try.csv", a)
 
