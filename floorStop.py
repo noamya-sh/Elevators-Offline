@@ -1,4 +1,5 @@
 class floorStop:
+
     def __init__(self, floor: int, time: float):
         self.floor = floor
         self.time = time
