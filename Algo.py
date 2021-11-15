@@ -1,8 +1,8 @@
 import csv
 import sys
 
-from Building import Building
-from CallOfElevator import CallOfElevator
+from Building import *
+from CallOfElevator import *
 from Elevator import * #Elevator
 
 
@@ -20,7 +20,7 @@ class Algo:
             CallsList = []
             csvreader = csv.reader(file)
             for row in csvreader:
-                c = CallOfElevator.CallOfElevator(name=row[0], Time=float(row[1]), src=int(row[2]),
+                c = CallOfElevator(name=row[0], Time=float(row[1]), src=int(row[2]),
                                    dest=int(row[3]), sta=row[4],
                                    ele=int(row[5]))
                 c.ele = Algo.allocate(c)
@@ -69,8 +69,12 @@ class Algo:
 
 
 if __name__ == '__main__':
-    a = Algo.readcsv("Calls_b.csv")
-    Algo.writeCsv("try.csv", a)
+    d = Algo("B5.json Calls_b.csv try.csv")
+
+
+    # Algo("B5.json Calls_b.csv try.csv")
+    # a = Algo.readcsv("Calls_b.csv")
+    # Algo.writeCsv("try.csv", a)
 
     # a = Algo("<Building.json> <Calls.csv> <output.csv>")
     #     with open("Calls_a.csv") as file:

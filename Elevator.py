@@ -1,4 +1,4 @@
-# import numpy as np
+import numpy as np
 from CallOfElevator import *
 class Elevator:
     def __init__(self, _id:int=None, _speed:float=None, _minFloor:int=None,
@@ -12,7 +12,6 @@ class Elevator:
         self._openTime = _openTime
         self._startTime = _startTime
         self._stopTime = _stopTime
-        self.calls=[]
         self.fs=[]
 
     # def __str__(self) -> str:
@@ -21,17 +20,22 @@ class Elevator:
     #            f"openTime:{self._openTime}, startTime:{self._startTime}, stopTime:{self._stopTime}"
 
     def __add__(self, call:CallOfElevator):
-        self.calls.append(CallOfElevator)
-        time2src,time2dest= self.reachFloor(call.src, call.dest, call.Time)
-        if time2src!=-1:
-            self.fs.append(floorStop(call.src,time2src))
-        if time2dest!=-1:
-            self.fs.append(floorStop(call.dest, time2dest))
-        # self.fs.sort
+        self.addfloorsStop(call)
         return self
 
     def __iter__(self):
         return self.fs.__iter__()
+
+    def __lt__(self, other,call:CallOfElevator):
+        return self.time(call) > other.time(call)
+
+    def addfloorsStop(self,call:CallOfElevator):
+        time2src, time2dest = self.reachFloor(call.src, call.dest, call.Time)
+        if time2src != -1:
+            self.fs.append(floorStop(call.src, time2src))
+        if time2dest != -1:
+            self.fs.append(floorStop(call.dest, time2dest))
+        self.fs.sort()
 
     def pos(self,time):
         if not self.fs:
@@ -109,14 +113,25 @@ class Elevator:
                 self.fs[i] += self.stop1()
             i += 1
 
-        return (t1,t2)
+        return t1,t2
 
     def time(self,call:CallOfElevator):
+
         callInit = call.Time
         i=0
         while self.fs[i]<callInit:
             i+=1
-        list =[callInit]
+        pre = self.fs[:i]
+        fs2 = self.fs[i:].copy()
+        self.addfloorsStop(call)
+        list1 =[]
         while i < len(self.fs):
-            list.append(self.fs[i].time)
-        all = np.diff(list).sum()
+            list1.append(self.fs[i].time)
+        list2 = []
+        j=0
+        while j < len(fs2):
+            list2.append(fs2[j].time)
+
+        cost = np.diff(list1).sum() - np.diff(list2).sum()
+        self.fs=pre+fs2
+        return cost

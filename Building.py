@@ -1,4 +1,5 @@
 import json
+from Elevator import *
 
 class Building:
     def __init__(self, minFloor: int = None, maxFloor: int = None, el: Elevator = {}, **kwargs):

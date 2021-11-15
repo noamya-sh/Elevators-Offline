@@ -23,9 +23,9 @@ if __name__ == '__main__':
     # e = Elevator(**d)
     # x, y = e.reachFloor(0, 5, 62)
     # print(x,y)
-    list = [1,5,8,10]
+    list = [1,5,8,10,15]
     print(list)
-    n = np.diff(list)[1:]
+    n = np.diff(list)
     for i in n:
         print(i)
     print(np.diff(list).sum())

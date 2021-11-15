@@ -13,16 +13,3 @@ class CallOfElevator:
     def __str__(self) -> str:
         return f"{self.name}, {self.Time}, src:{self.src}, dest:{self.dest}, {self.sta}, {self.ele}"
 
-def readcsv1(file_name:str=""):
-    with open(file_name) as file:
-        rows = []
-        a = []
-        csvreader = csv.reader(file)
-        for row in csvreader:
-            c = CallOfElevator(name=row[0], Time=row[1], src=row[2], dest=row[3], sta=row[4],
-                                ele=int(row[5]))
-            a.append(c)
-            rows.append(row)
-        for i in a:
-            print(i)
-
