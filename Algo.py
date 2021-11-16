@@ -1,6 +1,6 @@
 import csv
 import sys
-
+import random
 from Building import Building
 from CallOfElevator import *
 from Elevator import * #Elevator
@@ -30,6 +30,7 @@ class Algo:
             return CallsList
 
     def allocate(self, call: CallOfElevator=None):
+        # return random.randint(0, 9)
         k = self.building.el[0]
         k.call2test=call
         i = 0
@@ -63,7 +64,7 @@ if __name__ == '__main__':
     # d=Algo()
     # print(d.readcsv("C:\\Users\\נעמיה\\PycharmProjects\\Elevators-Offline\\Calls_a.csv"))
     # d.writeCsv("try.csv",a)
-    Algo("B5.json C:\\Users\\נעמיה\\PycharmProjects\\Elevators-Offline\\Calls_c.csv try.csv")
+    Algo("B5.json C:\\Users\\נעמיה\\PycharmProjects\\Elevators-Offline\\Calls_d.csv try.csv")
     # a = Algo.readcsv("Calls_b.csv")
     # Algo.writeCsv("try.csv", a)
 

@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from floorStop import *
 from CallOfElevator import *
 class Elevator:
@@ -34,9 +35,9 @@ class Elevator:
     def addfloorsStop(self,call:CallOfElevator):
         time2src, time2dest = self.reachFloor(call.src, call.dest, call.Time)
         if time2src != -1:
-            self.fs.append(floorStop(call.src, time2src))
+            self.fs.append(floorStop(call.src, math.ceil(time2src)))
         if time2dest != -1:
-            self.fs.append(floorStop(call.dest, time2dest))
+            self.fs.append(floorStop(call.dest, math.ceil(time2dest)))
         self.fs.sort()
 
     def pos(self,time):
@@ -77,7 +78,13 @@ class Elevator:
 
     def stop1(self):
         return self._stopTime+self._openTime+self._closeTime+self._startTime
-
+    def cleanPast(self,time):
+        i=0
+        while i < len(self.fs):
+            if self.fs[i].time<time:
+                self.fs.remove(self.fs[i])
+            i+=1
+        return
     def reachFloor(self,src : int, dest : int, timeInit : float):#return the time that elevator reach the floor
         t1 = t2 = timeInit
         if not self.fs:
@@ -87,14 +94,13 @@ class Elevator:
             t2 += self.disInTime(abs(src) + abs(dest - src)) + self.stop1() + self._stopTime + self._openTime
             return t1,t2
         i=0
+        # self.cleanPast(timeInit)
         prev=floorStop(self.pos(timeInit),timeInit)
         while  i < len(self.fs) and self.fs[i].time < timeInit: #search the next task of elevator
             prev = self.fs[i]  # self.pos(timeInit)
             i+=1
 
-
-
-        while i < len(self.fs) and abs(self.fs[i].floor - prev.floor) < abs(src - prev.floor):# not trust
+        while i < len(self.fs) and abs(self.fs[i].floor - prev.floor) < abs(src - prev.floor)+self.stopInFloors():# not trust
             prev = self.fs[i]
             i+=1
         if i==len(self.fs) or self.fs[i].floor != src:
@@ -103,28 +109,34 @@ class Elevator:
             # prev = src
         else:
             t1=-1
-        while i < len(self.fs) and abs(self.fs[i].floor - prev.floor) < abs(dest - prev.floor):# not trust
+        while i < len(self.fs) and abs(self.fs[i].floor - prev.floor) < abs(dest - prev.floor)+self.stopInFloors():# not trust
             if t1!=-1:
                 self.fs[i].time = prev.time + self.disInTime(abs(prev.floor - self.fs[i].floor)) + self.stop1()
             prev = self.fs[i]
             i+=1
         if i==len(self.fs) or self.fs[i].floor != dest:
             t2 += prev.time + self.disInTime(abs(dest - prev.floor)) + self._stopTime+self._openTime
+            prev = floorStop(src, t1)
         else:
             t2=-1
 
         while i < len(self.fs):
-            if t1!=-1:
-                self.fs[i] += self.stop1()
-            if t2!=-1:
-                self.fs[i] += self.stop1()
+            # if t1!=-1:
+            #     self.fs[i] = self.stop1()
+            # if t2!=-1:
+            #     self.fs[i] += self.stop1()
+            self.fs[i].time = prev.time + self.disInTime(abs(prev.floor - self.fs[i].floor)) + self.stop1()
+            prev = self.fs[i]
             i += 1
 
         return t1,t2
+    def stopInFloors(self):
+        return self.disInFloor(self._stopTime)
 
     def time(self,call:CallOfElevator):
         if not self.fs:
             self.addfloorsStop(call)
+            return self.fs[1].time - call.Time
         callInit = call.Time
         i=0
         while i<len(self.fs) and self.fs[i].time<callInit:
@@ -141,6 +153,6 @@ class Elevator:
         while j < len(fs2):
             list2.append(fs2[j].time)
             j+=1
-        cost = np.diff(list1).sum() - np.diff(list2).sum()
+        cost = np.cumsum(np.diff(list1)).sum() - np.cumsum(np.diff(list2).sum())
         self.fs=pre+fs2
         return cost

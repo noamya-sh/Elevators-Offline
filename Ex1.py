@@ -26,9 +26,8 @@ if __name__ == '__main__':
     list = [1,5,8,10,15]
     print(list)
     n = np.diff(list)
-    for i in n:
-        print(i)
-    print(np.diff(list).sum())
+    print(n)
+    print(np.cumsum(n))
     # def vv(x):
     #     return (x,2*x)
     # i,j = vv(5)
