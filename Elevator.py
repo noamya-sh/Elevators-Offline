@@ -103,7 +103,7 @@ class Elevator:
         if not list:
             pos = self.pos(timeInit)
             t1 +=self.disInTime(abs(src-pos))+self.stop1()
-            t2 = t1 + self.disInTime(abs(dest-src))+self.stop1()
+            t2 = math.ceil(t1) + self.disInTime(abs(dest-src))+self.stop1()
             return math.ceil(t1), math.ceil(t2)
         if not list2:
             prev=floorStop(0,timeInit)

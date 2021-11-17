@@ -1,63 +1,95 @@
-import json
-class Elevator:
-    def __init__(self,_id:int =None,_speed:float =None, _minFloor:int =None, _maxFloor:int =None,
-                 _closeTime:float =None,_openTime:float =None,_startTime:float =None,_stopTime:float =None,**kwargs):
-
-        self._id=_id;
-        self._speed=_speed
-        self._minFloor=_minFloor
-        self._maxFloor=_maxFloor
-        self._closeTime=_closeTime
-        self._openTime=_openTime
-        self._startTime=_startTime
-        self._stopTime=_stopTime
-
-    def __str__(self) -> str:
-        return f"Elevator id:{self._id}, speed:{self._speed}, minFloor:{self._minFloor}, " \
-               f"maxFloor:{self._maxFloor}, closeTime:{self._closeTime}, openTime:{self._openTime}," \
-               f" startTime:{self._startTime}, stopTime:{self._stopTime}"
+import csv
+import sys
+import random
+from Building import Building
+from CallOfElevator import *
+from Elevator import * #Elevator
 
 
-class Building:
-    def __init__(self,minFloor:int =None,maxFloor:int =None,**kwargs):
-        self.minFloor=minFloor
-        self.maxFloor=maxFloor
-        self.elevators={}
+class Algo2:
+    def __init__(self, string: str = None):
+        # self.building=Building()
+        list = string.split(" ")
+        b = Building()
+        b.from_json(list[0])
+        self.building = b
+        self.csv = self.readcsv(list[1])
+        self.out = list[2]
+        self.writeCsv(self.out, self.csv)
 
-    def getElevator(self,index):
-        return self.elevators[index]
+    def readcsv(self, file_name):
+        with open(file_name) as file:
+            CallsList = []
+            csvreader = csv.reader(file)
+            for row in csvreader:
+                c = CallOfElevator(name=row[0], Time=float(row[1]), src=int(row[2]),
+                                   dest=int(row[3]), sta=row[4],
+                                   ele=int(row[5]))
+                c.ele = self.allocate(c)
+                CallsList.append(c)
+            return CallsList
 
-    def init_from_file(self, file_name: str) -> None:
-        with open(file_name, "r") as f:
-            dict_building = json.load(f)
-            self.minFloor=dict_building.get("_minFloor")
-            self.maxFloor = dict_building.get("_maxFloor")
-            list_ele = dict_building.get("_elevators")
-            i=0
-            el={}
-            for d in list_ele:
-                # elvator=Elevator()
-                # elvator.__dict__.update(d)
-                elvator = Elevator(**d)
-                el[i] = elvator
-                i+=1
-            self.elevators=el
-    def __str__(self):
-        s="**************************************************" \
-          "The Building*************************************************"
-        s+=f"\nminFloor:{self.minFloor}  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" \
-           f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  maxFloor:{self.maxFloor}\n"
-        for i in self.elevators:
-            s+=str(self.elevators[i])
-            s+="\n"
-        return s
+    def allocate(self, call: CallOfElevator=None):
+        # return random.randint(0, 9)
+        # k = self.building.el[0]
+        # k.call2test=call
+        i = 0
+        p=[]
+        for v in self.building:
+            if not v.fs:
+                p.append(v)
+        # p = [e for i, e in enumerate(list(self.building.el.values())) if not e.fs]
+        min =10000
+        x=0
+        if len(p)>0:
+            for i in range(len(p)):
+                if p[i].time(call) < min:
+                    min = p[i].time(call)
+                    x = p[i]
+            p[i]+=call
+            return p[i]._id
+        for e in self.building:
+            e.call2test = call
+            if k>e:
+               k=e
+        k+=call
+        return k._id
+        # if call.src <= -1 and call.Time<90.155555555:
+        #     return 0
+        # else:
+        #     return 1
+
+
+    def writeCsv(self, file, list):
+        new_list = []
+        for obj in list:
+            new_list.append(obj.__dict__.values())
+        with open(file, 'w', newline="") as f:
+            csvwriter = csv.writer(f)
+            csvwriter.writerows(new_list)
+            print(new_list)
 
 
 if __name__ == '__main__':
-    b=Building()
-    b.init_from_file("B1.json")
-    # d={'_id': 0, '_speed': 0.5, '_minFloor': -2, '_maxFloor': 10, '_closeTime': 2.0, '_openTime': 2.0,
-    # '_startTime': 3.0, '_stopTime': 3.0}
-    # for i in b.elevators:
-    #     print(b.elevators[i])
-    print(b.elevato)
+    # d=Algo("B2.json")
+    # b=Building()
+    # b.from_json("B2.json")
+    # # d.building=b
+    # d=Algo()
+    # print(d.readcsv("C:\\Users\\נעמיה\\PycharmProjects\\Elevators-Offline\\Calls_a.csv"))
+    # d.writeCsv("try.csv",a)
+    Algo2("B5.json C:\\Users\\נעמיה\\PycharmProjects\\Elevators-Offline\\Calls_d.csv try.csv")
+    # a = Algo.readcsv("Calls_b.csv")
+    # Algo.writeCsv("try.csv", a)
+
+    # a = Algo("<Building.json> <Calls.csv> <output.csv>")
+    #     with open("Calls_a.csv") as file:
+    #         a = []
+    #         csvreader = csv.reader(file)
+    #         for row in csvreader:
+    #             c = CallOfElevator(name=row[0], Time=row[1], src=row[2], dest=row[3], sta=row[4],
+    #                            ele=0)
+    #             a.append(c)
+    #         for i in a:
+    #             print(i.ele)
+    #             print(i.dest)

@@ -34,6 +34,20 @@ class Algo:
         k = self.building.el[0]
         k.call2test=call
         i = 0
+        p=[]
+        for v in self.building:
+            if not v.fs:
+                p.append(v)
+        # p = [e for i, e in enumerate(list(self.building.el.values())) if not e.fs]
+        min =10000
+        x=0
+        if len(p)>0:
+            for i in range(len(p)):
+                if p[i].time(call) < min:
+                    min = p[i].time(call)
+                    x = p[i]
+            p[i]+=call
+            return p[i]._id
         for e in self.building:
             e.call2test = call
             if k>e:
