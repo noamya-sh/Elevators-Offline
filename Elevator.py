@@ -88,7 +88,7 @@ class Elevator:
         self.fs=[e for i, e in enumerate(self.fs) if e.time < time]
         return
     def reachFloor(self,src : int, dest : int, timeInit : float):#return the time that elevator reach the floor
-        self.cleanPast(timeInit)
+        # self.cleanPast(timeInit)
         t1 = t2 = timeInit
         if not self.fs:
             t1 += self.disInTime(abs(src))
@@ -97,47 +97,59 @@ class Elevator:
             t2 += self.disInTime(abs(src) + abs(dest - src)) + self.stop1() + self._stopTime + self._openTime
             return math.ceil(t1),math.ceil(t2)
 
-        list = [i for i, j in enumerate(self.fs) if j.time > timeInit]
+        list = [j for i, j in enumerate(self.fs) if j.time > timeInit]
+        list2 = [j for i, j in enumerate(self.fs) if j.time <= timeInit]
+
         if not list:
             pos = self.pos(timeInit)
             t1 +=self.disInTime(abs(src-pos))+self.stop1()
             t2 = t1 + self.disInTime(abs(dest-src))+self.stop1()
             return math.ceil(t1), math.ceil(t2)
+        if not list2:
+            prev=floorStop(0,timeInit)
+        else:
+            maxSmall = max(list2)
+            x = list[0].floor - maxSmall.floor
+            if x<0:
+                prev = floorStop(list[0].floor + self.disInFloor(maxSmall.time - timeInit), timeInit)
+            else:
+                prev = floorStop(list[0].floor + self.disInFloor(maxSmall.time - timeInit), timeInit)
         i=0
-        self.cleanPast(timeInit)
-        prev=floorStop(self.pos(timeInit),timeInit)
-        while  i < len(self.fs) and self.fs[i].time < timeInit: #search the next task of elevator
-            prev = self.fs[i]  # self.pos(timeInit)
-            i+=1
+        # self.cleanPast(timeInit)
+        # prev=floorStop(list[0].floor-self.disInFloor(list[0].time-timeInit),timeInit)#floorStop(self.pos(timeInit),timeInit)
+        # while  i < len(list) and list[i].time < timeInit: #search the next task of elevator
+        #     prev = self.fs[i]  # self.pos(timeInit)
+        #     i+=1
 
-        while i < len(self.fs) and abs(self.fs[i].floor - prev.floor) < abs(src - prev.floor)+self.stopInFloors():# not trust
-            prev = self.fs[i]
+        while i < len(list) and abs(list[i].floor - prev.floor) < abs(src - prev.floor)+self.stopInFloors():# not trust
+            prev = list[i]
             i+=1
-        if i==len(self.fs) or self.fs[i].floor != src:
-            t1 += prev.time + self.disInTime(abs(src - prev.floor)) + self._stopTime + self._openTime
+        if i==len(list) or list[i].floor != src:
+            t1 = prev.time + self.disInTime(abs(src - prev.floor)) + self._stopTime + self._openTime
             prev=floorStop(src,t1)
             # prev = src
         else:
             t1=-1
-        while i < len(self.fs) and abs(self.fs[i].floor - prev.floor) < abs(dest - prev.floor)+self.stopInFloors():# not trust
+        while i < len(list) and abs(list[i].floor - prev.floor) < abs(dest - prev.floor)+self.stopInFloors():# not trust
             if t1!=-1:
-                self.fs[i].time = prev.time + self.disInTime(abs(prev.floor - self.fs[i].floor)) + self.stop1()
-            prev = self.fs[i]
+                list[i].time = math.ceil(prev.time + self.disInTime(abs(prev.floor - list[i].floor)) + self.stop1())
+            prev = list[i]
             i+=1
-        if i==len(self.fs) or self.fs[i].floor != dest:
-            t2 += prev.time + self.disInTime(abs(dest - prev.floor)) + self._stopTime+self._openTime
-            prev = floorStop(src, t1)
+        if i==len(list) or list[i].floor != dest:
+            t2 = prev.time + self.disInTime(abs(dest - prev.floor)) + self._stopTime+self._openTime
+            prev = floorStop(dest, t2)
         else:
             t2=-1
 
-        while i < len(self.fs):
+        while i < len(list):
             # if t1!=-1:
             #     self.fs[i] = self.stop1()
             # if t2!=-1:
             #     self.fs[i] += self.stop1()
-            self.fs[i].time = prev.time + self.disInTime(abs(prev.floor - self.fs[i].floor)) + self.stop1()
-            prev = self.fs[i]
+            list[i].time = math.ceil(prev.time + self.disInTime(abs(prev.floor - list[i].floor)) + self.stop1())
+            prev = list[i]
             i += 1
+        self.fs=list2+list
         return math.ceil(t1),math.ceil(t2)
     def stopInFloors(self):
         return self.disInFloor(self._stopTime)
