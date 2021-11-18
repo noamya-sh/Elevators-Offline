@@ -30,24 +30,22 @@ class Algo:
             return CallsList
 
     def allocate(self, call: CallOfElevator=None):
-        # return random.randint(0, 9)
         k = self.building.el[0]
         k.call2test=call
-        # i = 0
-        # p=[]
-        # for v in self.building:
-        #     if not v.fs:
-        #         p.append(v)
-        # # # p = [e for i, e in enumerate(list(self.building.el.values())) if not e.fs]
-        # min =10000
-        # x=0
-        # if len(p)>0:
-        #     for i in range(len(p)):
-        #         if p[i].time(call) < min:
-        #             min = p[i].time(call)
-        #             x = p[i]
-        #     x+=call
-        #     return x._id
+        i = 0
+        p=[]
+        for v in self.building:
+            if not v.fs or (len(v.fs) == 1 and all(k < call.Time for k in v.fs.keys())):
+                p.append(v)
+        min =10000
+        x=0
+        if len(p)>0:
+            for i in range(len(p)):
+                if p[i].time(call) < min:
+                    min = p[i].time(call)
+                    x = p[i]
+            x+=call
+            return x._id
 
         for e in self.building:
             e.call2test = call
@@ -57,6 +55,10 @@ class Algo:
         return k._id
 
     def writeCsv(self, file, list):
+        # update_calls = []
+        # for c in list:
+        #     c.ele = self.allocate(c)
+        #     update_calls.append(c.__dict__.values())
         new_list = []
         for obj in list:
             new_list.append(obj.__dict__.values())
@@ -74,7 +76,12 @@ if __name__ == '__main__':
     # d=Algo()
     # print(d.readcsv("C:\\Users\\נעמיה\\PycharmProjects\\Elevators-Offline\\Calls_a.csv"))
     # d.writeCsv("try.csv",a)
-    Algo("B5.json C:\\Users\\נעמיה\\PycharmProjects\\Elevators-Offline\\Calls_d.csv try.csv")
+    import time
+
+    st_time = time.time()
+    Algo("B5.json Calls_d.csv try.csv")
+    sp_time = time.time()
+    print(sp_time-st_time)
     # a = Algo.readcsv("Calls_b.csv")
     # Algo.writeCsv("try.csv", a)
 

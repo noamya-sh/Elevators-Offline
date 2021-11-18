@@ -55,6 +55,26 @@ class Elevator:
                 return i+1;
         return len(l)
 
+    # def pos(self,dict,time):
+    #     dic1 = {k: v for k, v in dict.items() if k > time}
+    #     dic2 = {k: v for k, v in dict.items() if k <= time}
+    #     if len(dic1) == 0 and len(dic2) == 0:
+    #         return 0
+    #     if len(dic2) > 0:
+    #         if len(dic1)>0:
+    #             x = dic1[min(dic1)]-dic2[max(dic2)]
+    #             if x > 0:
+    #                 return dic2[max(dic2)] + self.disInFloor(math.ceil(time - max(dic2) - self._startTime))+self.stopInFloors()
+    #             else:
+    #                 return dic2[max(dic2)] - self.disInFloor(math.ceil(time - max(dic2) - self._startTime))-self.stopInFloors()
+    #         else:
+    #             return dic2[max(dic2)]
+    #     else:
+    #         if dic1[min(dic1)]>0:
+    #             return self.disInFloor(math.ceil(time - self._startTime))+self.stopInFloors()
+    #         else:
+    #             return 0-self.disInFloor(math.ceil(time - self._startTime))-self.stopInFloors()
+
     def reachFloor(self,dict,src : int, dest : int, timeInit : float):#return the time that elevator reach the floors
         t1 = t2 = timeInit
         if not dict:
@@ -64,7 +84,7 @@ class Elevator:
             t2 = math.ceil(t1) +self.disInTime(abs(src) + abs(dest - src)) + self.stop1()
             return math.ceil(t1), math.ceil(t2)
         dic1 = {k: v for k, v in dict.items() if k > timeInit}
-        dic2 = {k: v for k, v in dict.items() if k <= timeInit}
+        dic2 = {k: v for k, v in dict.items() if k < timeInit}
         if not dic1:
             pos = dic2[max(dic2)]
             t1 = max(dic2) + self.disInTime(abs(src-pos))+self.stop1()
@@ -124,10 +144,28 @@ class Elevator:
         t1, t2 = self.reachFloor(d2, call.src, call.dest, call.Time)
         timeTask = t2 - call.Time
         self.addfloorsStop(d2, call)
+        d3 = {k: v for k, v in dic.items() if not (k == t1 and v== call.src) and not (k ==t2 and v==call.dest)}
         l=[]
-        l.append(callInit)
+        l.append(math.ceil(callInit))
         list1 = l + list(sorted(dic.keys()))
-        list2 = l + list(sorted(d2.keys()))
-        t1,t2 =self.reachFloor(d2,call.src,call.dest,call.Time)
-        cost = np.cumsum(np.diff(list1)).sum() - np.cumsum(np.diff(list2).sum())
+        # print(list1)
+        list2 = l + list(sorted(d3.keys()))
+        # print(list2)
+        # s1=self.calDiff(list1)
+        # s2=self.calDiff(list2)
+        # if len(list2) != len(list1):
+        #     print(callInit)
+        #     print(list1)
+        #     # print(np.cumsum(np.diff(list1)))
+        #     print(list2)
+            # print(np.cumsum(np.diff(list2)))
+        #     print("*************************")
+        # s = 0
+        # for i in range(len(list2)):
+        #     s+=list2[i]-list1[i]
+        cost = np.diff(list2).sum() - np.diff(list1).sum()
+        # cost = s2-s1
         return cost + timeTask
+    #
+    # def calDiff(self,list):
+    #     return sum([list[i] - list[0] for i in range(1, len(list))])
