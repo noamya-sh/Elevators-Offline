@@ -2,6 +2,7 @@ import numpy as np
 import math
 from floorStop import *
 from CallOfElevator import *
+import copy
 class Elevator:
     def __init__(self, _id:int=None, _speed:float=None, _minFloor:int=None,
                  _maxFloor:int=None, _closeTime:float=None, _openTime:float=None,
@@ -14,7 +15,7 @@ class Elevator:
         self._openTime = _openTime
         self._startTime = _startTime
         self._stopTime = _stopTime
-        self.fs=[]
+        self.fs= {}
         self.call2test=None
 
     # def __str__(self) -> str:
@@ -23,52 +24,18 @@ class Elevator:
     #            f"openTime:{self._openTime}, startTime:{self._startTime}, stopTime:{self._stopTime}"
 
     def __add__(self, call:CallOfElevator):
-        self.addfloorsStop(call)
+        self.addfloorsStop(self.fs,call)
         return self
 
     def __iter__(self):
         return self.fs.__iter__()
 
     def __lt__(self, other):
-        return self.time(self.call2test) > other.time(self.call2test)
+        return self.time(self.call2test) < other.time(self.call2test)
 
-    def addfloorsStop(self,call:CallOfElevator):
-        time2src, time2dest = self.reachFloor(call.src, call.dest, call.Time)
-        if time2src != -1:
-            self.fs.append(floorStop(call.src, time2src))
-        if time2dest != -1:
-            self.fs.append(floorStop(call.dest, time2dest))
-        self.fs.sort()
-
-    def pos(self,time):
-        if not self.fs:
-            return 0
-        t = self.fs[0].time
-
-        #Extreme cases:
-        if t>time:
-            return self.disInFloor(time - self._startTime)
-        if self.fs[len(self.fs)-1].time<time:
-            return self.fs[len(self.fs)-1].floor
-
-        i = 0
-        while t<time and i < len(self.fs):
-            t=self.fs[i].time
-            i+=1
-
-        previous=self.fs[i - 1]
-        if i==len(self.fs):
-            return previous.floor
-        next = self.fs[i]
-        disT = time - previous.time - self._startTime
-        if disT <0:  #yet in previous floor
-            return previous.floor
-
-        if previous.floor < next.floor:
-            return previous.floor + self.disInFloor(disT)
-        else:
-            return previous.floor - self.disInFloor(disT)
-
+    def addfloorsStop(self,dict,call:CallOfElevator):
+        time2src, time2dest = self.reachFloor(dict,call.src, call.dest, call.Time)
+        self.insetKV(dict, call.src,time2src,call.dest,time2dest)
 
     def disInFloor(self,travelTime:float)->float: # speed * time = distance
         return self._speed * travelTime
@@ -78,110 +45,89 @@ class Elevator:
 
     def stop1(self):
         return self._stopTime+self._openTime+self._closeTime+self._startTime
-    def cleanPast(self,time):
-        # i=0
-        # while i < len(self.fs):
-        #     if self.fs[i].time<time:
-        #         self.fs.remove(self.fs[i])
-        #     i+=1
 
-        self.fs=[e for i, e in enumerate(self.fs) if e.time < time]
-        return
-    def reachFloor(self,src : int, dest : int, timeInit : float):#return the time that elevator reach the floor
-        # self.cleanPast(timeInit)
+    def getind(self,list,floor):
+        l = np.array(list)
+        diff = abs(l[1:] - l[:-1])
+        ls = abs(l[1:] - floor) + abs(floor - l[:-1])
+        for i in range(len(ls)):
+            if ls[i] == diff[i]:
+                return i+1;
+        return len(l)
+
+    def reachFloor(self,dict,src : int, dest : int, timeInit : float):#return the time that elevator reach the floors
         t1 = t2 = timeInit
-        if not self.fs:
+        if not dict:
             t1 += self.disInTime(abs(src))
-            if src!=0:
-                t1+=self._startTime+self._stopTime+self._openTime
-            t2 += self.disInTime(abs(src) + abs(dest - src)) + self.stop1() + self._stopTime + self._openTime
-            return math.ceil(t1),math.ceil(t2)
-
-        list = [j for i, j in enumerate(self.fs) if j.time > timeInit]
-        list2 = [j for i, j in enumerate(self.fs) if j.time <= timeInit]
-
-        if not list:
-            pos = self.pos(timeInit)
-            t1 +=self.disInTime(abs(src-pos))+self.stop1()
-            t2 = math.ceil(t1) + self.disInTime(abs(dest-src))+self.stop1()
+            if src != 0:
+                t1 += self.stop1()
+            t2 = math.ceil(t1) +self.disInTime(abs(src) + abs(dest - src)) + self.stop1()
             return math.ceil(t1), math.ceil(t2)
-        if not list2:
-            prev=floorStop(0,timeInit)
+        dic1 = {k: v for k, v in dict.items() if k > timeInit}
+        dic2 = {k: v for k, v in dict.items() if k <= timeInit}
+        if not dic1:
+            pos = dic2[max(dic2)]
+            t1 = max(dic2) + self.disInTime(abs(src-pos))+self.stop1()
+            t2 = math.ceil(t1) + self.disInTime(abs(dest-src))+self.stop1()
         else:
-            maxSmall = max(list2)
-            x = list[0].floor - maxSmall.floor
-            if x<0:
-                prev = floorStop(list[0].floor + self.disInFloor(maxSmall.time - timeInit), timeInit)
+            ind = self.getind(list(dic1.values()), src)
+            dic1_keys = list(sorted(dic1.keys()))
+            dic1_values = list(dic1.values())
+            t1 = dic1_keys[ind-1] + self.disInTime(abs(dic1_values[ind-1]-src))+self.stop1()
+            if len(list(dic1.values())) > ind:
+                ind2 = self.getind(list(dic1.values())[ind:], dest)
+                dic1_keys = list(sorted(dic1.keys()))[ind:]
+                dic1_values = list(dic1.values())[ind:]
+                t2 = dic1_keys[ind2-1] + self.disInTime(abs(dic1_values[ind2-1]-dest))+2*self.stop1()
             else:
-                prev = floorStop(list[0].floor + self.disInFloor(maxSmall.time - timeInit), timeInit)
-        i=0
-        # self.cleanPast(timeInit)
-        # prev=floorStop(list[0].floor-self.disInFloor(list[0].time-timeInit),timeInit)#floorStop(self.pos(timeInit),timeInit)
-        # while  i < len(list) and list[i].time < timeInit: #search the next task of elevator
-        #     prev = self.fs[i]  # self.pos(timeInit)
-        #     i+=1
-
-        while i < len(list) and abs(list[i].floor - prev.floor) < abs(src - prev.floor)+self.stopInFloors():# not trust
-            prev = list[i]
-            i+=1
-        if i==len(list) or list[i].floor != src:
-            t1 = prev.time + self.disInTime(abs(src - prev.floor)) + self._stopTime + self._openTime
-            prev=floorStop(src,t1)
-            # prev = src
-        else:
-            t1=-1
-        while i < len(list) and abs(list[i].floor - prev.floor) < abs(dest - prev.floor)+self.stopInFloors():# not trust
-            if t1!=-1:
-                list[i].time = math.ceil(prev.time + self.disInTime(abs(prev.floor - list[i].floor)) + self.stop1())
-            prev = list[i]
-            i+=1
-        if i==len(list) or list[i].floor != dest:
-            t2 = prev.time + self.disInTime(abs(dest - prev.floor)) + self._stopTime+self._openTime
-            prev = floorStop(dest, t2)
-        else:
-            t2=-1
-
-        while i < len(list):
-            # if t1!=-1:
-            #     self.fs[i] = self.stop1()
-            # if t2!=-1:
-            #     self.fs[i] += self.stop1()
-            list[i].time = math.ceil(prev.time + self.disInTime(abs(prev.floor - list[i].floor)) + self.stop1())
-            prev = list[i]
-            i += 1
-        self.fs=list2+list
+                t2 = math.ceil(t1) + self.disInTime(abs(dest-src))+self.stop1()
         return math.ceil(t1),math.ceil(t2)
+
+    def insetKV(self,dict,f1,t1,f2,t2):
+        dic = {k: v for k, v in dict.items() if t1 <= k <= t2}
+        if t1 and t2 in dic:
+            return
+        if t1 not in dic:
+            for k,v in dic.items():
+                if k<t2:
+                    dict[math.ceil(k+self.stop1())] = dict.pop(k)
+            dict[t1] = f1
+        if t2 not in dic:
+            dic2 = {k: v for k, v in dict.items() if t2 < k}
+            for k,v in dic2.items():
+                dict[k+2*math.ceil(self.stop1())] = dict.pop(k)
+            dict[t2] = f2
+
     def stopInFloors(self):
         return self.disInFloor(self._stopTime)
 
+    def cleanfs(self,time):
+        dic = {k: v for k, v in self.fs.items() if k < time}
+        if len(dic)>0:
+            x = max(dic)
+            for k, v in dic.items():
+                if k!=x:
+                    self.fs.pop(k)
+
     def time(self,call:CallOfElevator):
         if not self.fs:
-            self.addfloorsStop(call)
-            x = self.fs[1].time - call.Time
-            self.fs=[]
+            self.addfloorsStop(self.fs,call)
+            x = max(self.fs) - call.Time
+            self.fs= {}
             return x
+
         callInit = call.Time
+        self.cleanfs(callInit)
         i=0
-        while i<len(self.fs) and self.fs[i].time<callInit:
-            i+=1
-        pre = self.fs[:i]
-        fs2 = self.fs[i:].copy()
-        t1,t2 =self.reachFloor(call.src,call.dest,call.Time)
-        self.addfloorsStop(call)
-        l=i
-        list1 =[e.time for i, e in enumerate(self.fs[l:])]
-        # while i < len(self.fs):
-        #     list1.append(self.fs[i].time)
-        #     i+=1
-        list2 = [e.time for i, e in enumerate(fs2)]
-        # j=0
-        # while j < len(fs2):
-        #     list2.append(fs2[j].time)
-        #     j+=1
-        # x = [i for i, e in enumerate(self.fs) if e.time > call.Time and e.floor==call.src]
-        # timeEnd = [e.time for i, e in enumerate(self.fs[x[0]:]) if e.floor == call.dest]
-        # timeTask = timeEnd[0] - call.Time
+        dic = {k: v for k, v in self.fs.items() if k > callInit}
+        d2 = copy.deepcopy(dic)
+        t1, t2 = self.reachFloor(d2, call.src, call.dest, call.Time)
         timeTask = t2 - call.Time
+        self.addfloorsStop(d2, call)
+        l=[]
+        l.append(callInit)
+        list1 = l + list(sorted(dic.keys()))
+        list2 = l + list(sorted(d2.keys()))
+        t1,t2 =self.reachFloor(d2,call.src,call.dest,call.Time)
         cost = np.cumsum(np.diff(list1)).sum() - np.cumsum(np.diff(list2).sum())
-        self.fs=pre+fs2
         return cost + timeTask
