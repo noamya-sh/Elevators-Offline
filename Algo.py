@@ -1,21 +1,18 @@
 import csv
 import sys
 import random
-from Building import Building
+from Building import *
 from CallOfElevator import *
-from Elevator import * #Elevator
+from Elevator import *
 
 
 class Algo:
-    def __init__(self, string: str = None):
-        # self.building=Building()
-        list = string.split(" ")
+    def __init__(self, json,input,output):
         b = Building()
-        b.from_json(list[0])
+        b.from_json(json)
         self.building = b
-        self.csv = self.readcsv(list[1])
-        self.out = list[2]
-        self.writeCsv(self.out, self.csv)
+        self.csv = self.readcsv(input)
+        self.writeCsv(output, self.csv)
 
     def readcsv(self, file_name):
         with open(file_name) as file:
@@ -34,6 +31,13 @@ class Algo:
         k.call2test=call
         i = 0
         p=[]
+        # if len(self.building.el) == 2:
+        #     if len(k.fs) < len(self.building.el[1].fs):
+        #         k += call
+        #         return k._id
+        #     else:
+        #         self.building.el[1] += call
+        #         return self.building.el[1]._id
         for v in self.building:
             if not v.fs or (len(v.fs) == 1 and all(k < call.Time for k in v.fs.keys())):
                 p.append(v)
@@ -55,44 +59,19 @@ class Algo:
         return k._id
 
     def writeCsv(self, file, list):
-        # update_calls = []
-        # for c in list:
-        #     c.ele = self.allocate(c)
-        #     update_calls.append(c.__dict__.values())
         new_list = []
         for obj in list:
             new_list.append(obj.__dict__.values())
         with open(file, 'w', newline="") as f:
             csvwriter = csv.writer(f)
             csvwriter.writerows(new_list)
-            # print(new_list)
 
 
 if __name__ == '__main__':
-    # d=Algo("B2.json")
-    # b=Building()
-    # b.from_json("B2.json")
-    # # d.building=b
-    # d=Algo()
-    # print(d.readcsv("C:\\Users\\נעמיה\\PycharmProjects\\Elevators-Offline\\Calls_a.csv"))
-    # d.writeCsv("try.csv",a)
+
     import time
 
     st_time = time.time()
-    Algo("B5.json Calls_d.csv try.csv")
+    Algo(json="B3.json", input="Calls_d.csv",output="try.csv")
     sp_time = time.time()
     print(sp_time-st_time)
-    # a = Algo.readcsv("Calls_b.csv")
-    # Algo.writeCsv("try.csv", a)
-
-    # a = Algo("<Building.json> <Calls.csv> <output.csv>")
-    #     with open("Calls_a.csv") as file:
-    #         a = []
-    #         csvreader = csv.reader(file)
-    #         for row in csvreader:
-    #             c = CallOfElevator(name=row[0], Time=row[1], src=row[2], dest=row[3], sta=row[4],
-    #                            ele=0)
-    #             a.append(c)
-    #         for i in a:
-    #             print(i.ele)
-    #             print(i.dest)

@@ -1,9 +1,9 @@
 import numpy as np
 import math
-from floorStop import *
 from CallOfElevator import *
 import copy
 class Elevator:
+
     def __init__(self, _id:int=None, _speed:float=None, _minFloor:int=None,
                  _maxFloor:int=None, _closeTime:float=None, _openTime:float=None,
                  _startTime:float=None, _stopTime:float=None, **kwargs):
@@ -143,6 +143,7 @@ class Elevator:
         d2 = copy.deepcopy(dic)
         t1, t2 = self.reachFloor(d2, call.src, call.dest, call.Time)
         timeTask = t2 - call.Time
+
         self.addfloorsStop(d2, call)
         d3 = {k: v for k, v in dic.items() if not (k == t1 and v== call.src) and not (k ==t2 and v==call.dest)}
         l=[]
@@ -151,8 +152,8 @@ class Elevator:
         # print(list1)
         list2 = l + list(sorted(d3.keys()))
         # print(list2)
-        # s1=self.calDiff(list1)
-        # s2=self.calDiff(list2)
+        s1=self.calDiff(list1)
+        s2=self.calDiff(list2)
         # if len(list2) != len(list1):
         #     print(callInit)
         #     print(list1)
@@ -163,9 +164,10 @@ class Elevator:
         # s = 0
         # for i in range(len(list2)):
         #     s+=list2[i]-list1[i]
-        cost = np.diff(list2).sum() - np.diff(list1).sum()
-        # cost = s2-s1
+        # cost = np.cumsum(np.diff(list2)).sum() - np.diff(list1).sum()
+
+        cost = s2-s1
         return cost + timeTask
     #
-    # def calDiff(self,list):
-    #     return sum([list[i] - list[0] for i in range(1, len(list))])
+    def calDiff(self,list):
+        return sum([list[i] - list[0] for i in range(1, len(list))])

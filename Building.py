@@ -29,15 +29,3 @@ class Building:
                 e[i] = Elev
                 i += 1
             self.el = e
-
-# if __name__ == '__main__':
-#     b = Building()
-#     b.from_json("B5.json")
-#     E = b.el[3]._speed
-#     s = b.minFloor
-#     # print(b)
-#     # print(E)
-#     # print(s)
-#     for i in b.el:
-#          print(b.el[i])
-#     # readcsv("Calls_a.csv")
