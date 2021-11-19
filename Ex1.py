@@ -1,4 +1,3 @@
-import sys
 from Algo import *
 from Building import *
 from Elevator import *

@@ -7,16 +7,10 @@ class Building:
         self.maxFloor = maxFloor
         self.el = el
 
-    def __str__(self) -> str:
-        c = ""
-        for i in self.el:
-            c += str(self.el[i])
-        return f"minFloor=:{self.minFloor}, maxFloor=:{self.maxFloor}, el:{c}"
-
     def __iter__(self):
         return self.el.values().__iter__()
 
-    def from_json(self, file_name: str):
+    def from_json(self, file_name: str)->None:
         with open(file_name, "r") as f:
             dict_ele = json.load(f)
             self.minFloor = dict_ele.get("_minFloor")

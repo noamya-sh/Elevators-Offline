@@ -1,6 +1,3 @@
-import csv
-
-
 class CallOfElevator:
     def __init__(self, name: str = "", Time = 0.0, src: int = 0, dest: int = 0, sta=0, ele: int = 0, **kwargs):
         self.name = name

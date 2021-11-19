@@ -1,0 +1,60 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+class Ex1{
++Ex1()
+}
+
+Algo <- Ex1
+Building <- Algo
+CallOfElevator <- Algo
+Elevator <-- Algo
+Elevator <--- Building
+CallOfElevator <- Elevator
+
+class CallOfElevator{
+name
+Time
+src
+dest
+sta
+ele
+}
+class Building{
+minFloor
+maxFloor
+el = {Elevator}
++from_json(json)
+}
+class Algo {
+Building building.
+List csv
++allocate(CallOfElevator)
++readcsv(file)
++writecsv()
+}
+class Elevator{
+_id
+_speed
+_minFloor
+_maxFloor
+_closeTime
+_openTime
+_startTime
+_stopTime
+fs={}
+call2test
++addfloorsStop()
++disInFloor()
++disInTime()
++stop1()
++getind()
++reachFloor()
++insetKV()
++cleanfs()
++time()
+}
+
+
+@enduml

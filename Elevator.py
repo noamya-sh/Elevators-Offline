@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import copy
 from CallOfElevator import *
 class Elevator:
 
@@ -82,7 +83,7 @@ class Elevator:
         :param timeInit: time init of the callForElevator.
         :return :t1: time reach src floor. t2:time reach dest floor.
         """
-        t1 = t2 = timeInit
+        t1 = t2 = math.ceil(timeInit)
         if not dict:
             t1 += self.disInTime(abs(src))
             if src != 0:
@@ -96,16 +97,26 @@ class Elevator:
             t1 = max(dic2) + self.disInTime(abs(src-pos))+self.stop1()
             t2 = math.ceil(t1) + self.disInTime(abs(dest-src))+self.stop1()
         else:
-            ind = self.getind(list(dic1.values()), src)
-            dic1_keys = list(sorted(dic1.keys()))
-            dic1_values = list(dic1.values())
-            t1 = dic1_keys[ind-1] + self.disInTime(abs(dic1_values[ind-1]-src))+self.stop1()
+            if src not in dic1.values():
+                ind = self.getind(list(dic1.values()), src)
+                dic1_keys = list(sorted(dic1.keys()))
+                dic1_values = list(dic1.values())
+                t1 = dic1_keys[ind-1] + self.disInTime(abs(dic1_values[ind-1]-src))+self.stop1()
+            else:
+                ind =list(dic1.values()).index(src)
+                t1= list(sorted(dic1.keys()))[ind]
+
             # find time for dest floor:
             if len(list(dic1.values())) > ind:
-                ind2 = self.getind(list(dic1.values())[ind:], dest)
-                dic1_keys = list(sorted(dic1.keys()))[ind:]
-                dic1_values = list(dic1.values())[ind:]
-                t2 = dic1_keys[ind2-1] + self.disInTime(abs(dic1_values[ind2-1]-dest))+2*self.stop1()
+                if dest not in dic1.values():
+                    ind2 = self.getind(list(dic1.values())[ind:], dest)
+                    dic1_keys = list(sorted(dic1.keys()))[ind:]
+                    dic1_values = list(dic1.values())[ind:]
+                    t2 = dic1_keys[ind2-1] + self.disInTime(abs(dic1_values[ind2-1]-dest))+2*self.stop1()
+                else:
+                    ind2 =list(dic1.values()).index(dest)
+                    t2 = list(sorted(dic1.keys()))[ind2]
+
             else:
                 t2 = math.ceil(t1) + self.disInTime(abs(dest-src))+self.stop1()
         return math.ceil(t1),math.ceil(t2)
@@ -120,7 +131,7 @@ class Elevator:
         :param t2: time reach dest floor.
         """
         dic = {k: v for k, v in dict.items() if t1 <= k <= t2}
-        if t1 and t2 in dic:
+        if t1 in dic and t2 in dic:
             return
         if t1 not in dic:
             for k,v in dic.items():
@@ -158,21 +169,19 @@ class Elevator:
         callInit = call.Time
         self.cleanfs(callInit)
         dic = {k: v for k, v in self.fs.items() if k > callInit}
-        c = list(dic.values())
-        f1 = self.getind(c,call.src)
-        f2 = self.getind(c, call.dest)
-        i=f1
-        b=[math.ceil(callInit)]
-        for i in range(len(c)):
-            if i <=f2:
-                b.append(c[i]+math.ceil(self._stopTime))
-            else:
-                b.append(c[i] + 2*math.ceil(self._stopTime))
-        t1, t2 = self.reachFloor(dic, call.src, call.dest, call.Time)
-        timeTask = math.ceil(t2 - call.Time)
-        c = [math.ceil(callInit)]+c
-        s1=self.calDiff(c)
-        s2=self.calDiff(b)
+        d2 = copy.deepcopy(dic)
+        t1, t2 = self.reachFloor(d2, call.src, call.dest, call.Time)
+        timeTask = t2 - call.Time
+
+        self.addfloorsStop(d2, call)
+        d3 = {k: v for k, v in dic.items() if not (k == t1 and v == call.src) and not (k == t2 and v == call.dest)}
+        l = []
+        l.append(math.ceil(callInit))
+        list1 = l + list(sorted(dic.keys()))
+        list2 = l + list(sorted(d3.keys()))
+        # print(list2)
+        s1 = self.calDiff(list1)
+        s2 = self.calDiff(list2)
         cost = s2-s1
         return cost + timeTask
     #
